@@ -1,10 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { opportunities, FIELDS, TYPES } from "./lib/opportunities";
+import { indiaOpportunities } from "./lib/opportunities.india";
 import { useTracked, toggleTracked } from "./lib/store";
+import { getProfile, clearProfile } from "./lib/profile";
 import { urgencyRank } from "./components/DeadlineSignal";
 import OpportunityCard from "./components/OpportunityCard";
+
+const ALL = [...opportunities, ...indiaOpportunities];
 
 export default function Discover() {
   const tracked = useTracked();
@@ -13,15 +18,25 @@ export default function Discover() {
   const [type, setType] = useState("All");
   const [freeOnly, setFreeOnly] = useState(false);
   const [sort, setSort] = useState("deadline");
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const p = getProfile();
+    if (p) {
+      setProfile(p);
+      const firstField = (p.fields || []).find((f) => FIELDS.includes(f));
+      if (firstField) setField(firstField);
+    }
+  }, []);
 
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    let list = opportunities.filter((op) => {
+    let list = ALL.filter((op) => {
       if (field !== "All" && !op.fields.includes(field)) return false;
       if (type !== "All" && op.type !== type) return false;
       if (freeOnly && !/free|stipend/i.test(op.cost)) return false;
       if (needle) {
-        const hay = `${op.title} ${op.org} ${op.blurb} ${op.fields.join(" ")}`.toLowerCase();
+        const hay = `${op.title} ${op.org} ${op.blurb} ${op.region} ${op.fields.join(" ")}`.toLowerCase();
         if (!hay.includes(needle)) return false;
       }
       return true;
@@ -33,6 +48,12 @@ export default function Discover() {
     );
     return list;
   }, [q, field, type, freeOnly, sort]);
+
+  function resetPersonalization() {
+    clearProfile();
+    setProfile(null);
+    setField("All");
+  }
 
   return (
     <main className="page">
@@ -46,6 +67,19 @@ export default function Discover() {
           A living map of the opportunities ambitious STEM students actually chase. Filter to what fits you,
           track the ones you want, and let the fuse tell you what is closing soon.
         </p>
+
+        {profile ? (
+          <p className="result-count" style={{ marginTop: 16 }}>
+            Personalized for you -{" "}
+            <button onClick={resetPersonalization} style={{ background: "none", border: "none", color: "var(--cobalt)", cursor: "pointer", fontFamily: "var(--mono)", fontSize: 12, padding: 0 }}>
+              reset
+            </button>
+          </p>
+        ) : (
+          <Link href="/start" className="empty-cta" style={{ marginTop: 18 }}>
+            Personalize in 30 seconds
+          </Link>
+        )}
       </header>
 
       <section className="controls" aria-label="Search and filters">
@@ -109,6 +143,7 @@ export default function Discover() {
               tracked={!!tracked[op.id]}
               trackedInfo={tracked[op.id]}
               onToggle={toggleTracked}
+              profile={profile}
             />
           ))}
         </section>

@@ -3,8 +3,22 @@
 import DeadlineSignal from "./DeadlineSignal";
 import { STATUSES, setStatus } from "../lib/store";
 
-export default function OpportunityCard({ op, tracked, trackedInfo, onToggle }) {
+function matchesProfile(op, profile) {
+  if (!profile) return false;
+  const fields = profile.fields || [];
+  const regions = profile.region || [];
+  const fieldHit = fields.some((f) => op.fields.includes(f));
+  const regionHit =
+    regions.includes("Anywhere") ||
+    regions.some((r) => op.region.includes(r)) ||
+    /global|online|anywhere/i.test(op.region);
+  const typeHit = (profile.chasing || []).includes(op.type);
+  return fieldHit && (regionHit || typeHit);
+}
+
+export default function OpportunityCard({ op, tracked, trackedInfo, onToggle, profile }) {
   const typeClass = op.type.replace(/\s+/g, "-").toLowerCase();
+  const matched = matchesProfile(op, profile);
   return (
     <article className={`card ${tracked ? "card-tracked" : ""}`}>
       <header className="card-top">
@@ -17,6 +31,12 @@ export default function OpportunityCard({ op, tracked, trackedInfo, onToggle }) 
           {tracked ? "Tracking" : "Track"}
         </button>
       </header>
+
+      {matched && (
+        <span style={{ alignSelf: "flex-start", fontFamily: "var(--mono)", fontSize: 10.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--mint)", background: "#e7f9f1", padding: "3px 9px", borderRadius: 6, marginBottom: 8 }}>
+          Matches you
+        </span>
+      )}
 
       <h3 className="card-title">{op.title}</h3>
       <p className="card-org">{op.org}</p>

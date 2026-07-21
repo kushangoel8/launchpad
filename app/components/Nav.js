@@ -22,6 +22,9 @@ export default function Nav() {
         <Link href="/tracked" className={pathname === "/tracked" ? "nav-link active" : "nav-link"}>
           Tracking{count > 0 ? <span className="nav-count">{count}</span> : null}
         </Link>
+        <Link href="/suggest" className={pathname === "/suggest" ? "nav-link active" : "nav-link"}>
+          Suggest
+        </Link>
       </div>
     </nav>
   );
