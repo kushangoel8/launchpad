@@ -1,23 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { opportunities } from "../lib/opportunities";
-import { indiaOpportunities } from "../lib/opportunities.india";
+import { indiaAll } from "../lib/india";
 import { useTracked, toggleTracked } from "../lib/store";
-import { getProfile } from "../lib/profile";
+import { useProfile } from "../lib/profile";
 import { urgencyRank, daysLeft } from "../components/DeadlineSignal";
 import OpportunityCard from "../components/OpportunityCard";
 
-const ALL = [...opportunities, ...indiaOpportunities];
+const ALL = [...opportunities, ...indiaAll];
 
 export default function Tracked() {
   const tracked = useTracked();
-  const [profile, setProfile] = useState(null);
-
-  useEffect(() => {
-    setProfile(getProfile());
-  }, []);
+  const profile = useProfile();
 
   const items = useMemo(() => {
     return ALL

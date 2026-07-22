@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { opportunities } from "../../lib/opportunities";
-import { indiaOpportunities } from "../../lib/opportunities.india";
-import { getRequirements, hasDetailedGuide } from "../../lib/requirements";
+import { indiaAll } from "../../lib/india";
+import { getRequirements } from "../../lib/requirements";
 import { useProfile } from "../../lib/profile";
 import { useTracked, toggleTracked } from "../../lib/store";
 import DeadlineSignal, { daysLeft } from "../../components/DeadlineSignal";
 
-const ALL = [...opportunities, ...indiaOpportunities];
+const ALL = [...opportunities, ...indiaAll];
 
 function analyseFit(op, profile) {
   if (!profile) return null;
@@ -88,7 +88,6 @@ export default function OpportunityDetail() {
   }
 
   const req = getRequirements(op.id);
-  const detailed = hasDetailedGuide(op.id);
   const fit = analyseFit(op, profile);
   const isTracked = !!tracked[op.id];
   const dl = daysLeft(op.deadline);
@@ -117,10 +116,20 @@ export default function OpportunityDetail() {
             <span className="meta">{op.level}</span>
           </div>
 
-          <div style={{ marginTop: 14, marginBottom: 18 }}>
-            <DeadlineSignal deadline={op.deadline} approx={op.approx} />
+          <div style={{ marginTop: 14, marginBottom: 12 }}>
+            <DeadlineSignal deadline={op.deadline} approx={op.approx} verifiedAt={op.verifiedAt} />
             <p className="result-count" style={{ marginTop: 8 }}>{op.window}</p>
           </div>
+
+          {op.approx ? (
+            <p style={{ fontSize: 12.5, color: "var(--amber)", background: "#fff8ec", border: "1px solid #f6e2c0", borderRadius: "var(--radius-sm)", padding: "10px 12px", margin: "0 0 16px" }}>
+              This date is our estimate from previous years, not a confirmed deadline. Check the official site before you plan around it.
+            </p>
+          ) : (
+            <p style={{ fontSize: 12.5, color: "var(--muted)", margin: "0 0 16px" }}>
+              Confirmed deadline{op.verifiedAt ? ` - last verified ${op.verifiedAt}` : ""}.
+            </p>
+          )}
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <button className={`track-btn ${isTracked ? "is-on" : ""}`} onClick={() => toggleTracked(op.id)}>
@@ -157,12 +166,24 @@ export default function OpportunityDetail() {
           <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: "var(--ink-soft)" }}>
             {req.needs.map((n, i) => <li key={i} style={{ marginBottom: 6 }}>{n}</li>)}
           </ul>
+          {op.components && op.components.length > 0 && (
+            <>
+              <p style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--muted)", margin: "16px 0 4px" }}>APPLICATION COMPONENTS</p>
+              <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: "var(--ink-soft)" }}>
+                {op.components.map((c, i) => <li key={i} style={{ marginBottom: 6 }}>{c}</li>)}
+              </ul>
+            </>
+          )}
         </section>
 
         <section style={panel}>
           <h2 style={sectionTitle}>Your prep plan</h2>
           <p style={{ fontSize: 13, color: "var(--muted)", margin: "0 0 14px" }}>
-            {dl >= 0 ? `${dl} days until the listed deadline. Tick these off as you go - saved on this device.` : "This deadline has passed - use this as prep for the next cycle."}
+            {op.approx
+              ? "Timing is estimated, so work backwards from the official date once it is announced. Tick these off as you go - saved on this device."
+              : dl >= 0
+                ? `${dl} days until the deadline. Tick these off as you go - saved on this device.`
+                : "This deadline has passed - use this as prep for the next cycle."}
           </p>
           {req.prep.map((step, i) => {
             const key = `p${i}`;
@@ -178,6 +199,12 @@ export default function OpportunityDetail() {
 
         <p style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", marginBottom: 40 }}>
           {req.note} Always confirm details on the official site.
+          {op.sourceUrl && (
+            <>
+              {" "}
+              <a href={op.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline" }}>Source</a>
+            </>
+          )}
         </p>
       </div>
     </main>

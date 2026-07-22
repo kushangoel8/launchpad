@@ -2,13 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { opportunities, FIELDS, TYPES } from "./lib/opportunities";
-import { indiaOpportunities } from "./lib/opportunities.india";
+import { indiaAll } from "./lib/india";
 import { useTracked, toggleTracked } from "./lib/store";
 import { useProfile, clearProfile } from "./lib/profile";
 import { urgencyRank } from "./components/DeadlineSignal";
 import OpportunityCard from "./components/OpportunityCard";
 
-const ALL = [...opportunities, ...indiaOpportunities];
+const ALL = [...opportunities, ...indiaAll];
 
 export default function Discover() {
   const tracked = useTracked();
