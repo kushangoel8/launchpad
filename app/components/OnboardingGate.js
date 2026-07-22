@@ -33,9 +33,10 @@ export default function OnboardingGate() {
         zIndex: 100,
         background: "var(--paper)",
         overflowY: "auto",
-        animation: "lp-fade-in .28s ease",
+        animation: "lpGateIn .28s ease",
       }}
     >
+      <style>{`@keyframes lpGateIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }`}</style>
       <OnboardingQuiz embedded />
     </div>
   );
