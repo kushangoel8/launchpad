@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { opportunities, FIELDS, TYPES } from "./lib/opportunities";
 import { indiaOpportunities } from "./lib/opportunities.india";
 import { useTracked, toggleTracked } from "./lib/store";
-import { getProfile, clearProfile } from "./lib/profile";
+import { useProfile, clearProfile } from "./lib/profile";
 import { urgencyRank } from "./components/DeadlineSignal";
 import OpportunityCard from "./components/OpportunityCard";
 
@@ -13,21 +12,19 @@ const ALL = [...opportunities, ...indiaOpportunities];
 
 export default function Discover() {
   const tracked = useTracked();
+  const profile = useProfile();
   const [q, setQ] = useState("");
   const [field, setField] = useState("All");
   const [type, setType] = useState("All");
   const [freeOnly, setFreeOnly] = useState(false);
   const [sort, setSort] = useState("deadline");
-  const [profile, setProfile] = useState(null);
 
+  // When the quiz completes, jump straight to the student's first interest.
   useEffect(() => {
-    const p = getProfile();
-    if (p) {
-      setProfile(p);
-      const firstField = (p.fields || []).find((f) => FIELDS.includes(f));
-      if (firstField) setField(firstField);
-    }
-  }, []);
+    if (!profile) return;
+    const firstField = (profile.fields || []).find((f) => FIELDS.includes(f));
+    if (firstField) setField(firstField);
+  }, [profile?.completedAt]);
 
   const results = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -49,12 +46,6 @@ export default function Discover() {
     return list;
   }, [q, field, type, freeOnly, sort]);
 
-  function resetPersonalization() {
-    clearProfile();
-    setProfile(null);
-    setField("All");
-  }
-
   return (
     <main className="page">
       <header className="hero">
@@ -68,17 +59,13 @@ export default function Discover() {
           track the ones you want, and let the fuse tell you what is closing soon.
         </p>
 
-        {profile ? (
+        {profile && (
           <p className="result-count" style={{ marginTop: 16 }}>
             Personalized for you -{" "}
-            <button onClick={resetPersonalization} style={{ background: "none", border: "none", color: "var(--cobalt)", cursor: "pointer", fontFamily: "var(--mono)", fontSize: 12, padding: 0 }}>
-              reset
+            <button onClick={clearProfile} style={{ background: "none", border: "none", color: "var(--cobalt)", cursor: "pointer", fontFamily: "var(--mono)", fontSize: 12, padding: 0 }}>
+              redo setup
             </button>
           </p>
-        ) : (
-          <Link href="/start" className="empty-cta" style={{ marginTop: 18 }}>
-            Personalize in 30 seconds
-          </Link>
         )}
       </header>
 

@@ -35,7 +35,7 @@ const STEPS = [
   },
 ];
 
-export default function OnboardingQuiz() {
+export default function OnboardingQuiz({ embedded = false }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -71,7 +71,9 @@ export default function OnboardingQuiz() {
 
   function finish() {
     saveProfile({ ...answers, completedAt: Date.now() });
-    router.push("/");
+    // When embedded, saving is enough: the profile store notifies every page and
+    // the overlay closes itself. The standalone /start route navigates home.
+    if (!embedded) router.push("/");
   }
 
   return (
@@ -123,12 +125,6 @@ export default function OnboardingQuiz() {
               style={{ marginTop: 0, opacity: canAdvance ? 1 : 0.4, cursor: canAdvance ? "pointer" : "not-allowed" }}
             >
               {isLast ? "Show my launchpad" : "Next"}
-            </button>
-          </div>
-
-          <div style={{ textAlign: "center", marginTop: 18 }}>
-            <button onClick={finish} style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontSize: 13, fontFamily: "var(--body)" }}>
-              Skip for now
             </button>
           </div>
         </div>

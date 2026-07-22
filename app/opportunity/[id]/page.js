@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { opportunities } from "../../lib/opportunities";
 import { indiaOpportunities } from "../../lib/opportunities.india";
 import { getRequirements, hasDetailedGuide } from "../../lib/requirements";
-import { getProfile } from "../../lib/profile";
+import { useProfile } from "../../lib/profile";
 import { useTracked, toggleTracked } from "../../lib/store";
 import DeadlineSignal, { daysLeft } from "../../components/DeadlineSignal";
 
@@ -53,13 +53,12 @@ function analyseFit(op, profile) {
 export default function OpportunityDetail() {
   const params = useParams();
   const tracked = useTracked();
-  const [profile, setProfile] = useState(null);
+  const profile = useProfile();
   const [done, setDone] = useState({});
 
   const op = ALL.find((o) => o.id === params.id);
 
   useEffect(() => {
-    setProfile(getProfile());
     try {
       const raw = localStorage.getItem(`launchpad.checklist.${params.id}`);
       if (raw) setDone(JSON.parse(raw));
@@ -149,16 +148,6 @@ export default function OpportunityDetail() {
           </section>
         )}
 
-        {!profile && (
-          <section style={panel}>
-            <h2 style={sectionTitle}>Is this for you?</h2>
-            <p style={{ fontSize: 14, color: "var(--ink-soft)", margin: "0 0 14px" }}>
-              Answer four quick questions and this page will tell you how well this fits you, and what would be missing.
-            </p>
-            <Link href="/start" className="empty-cta" style={{ marginTop: 0 }}>Personalize in 30 seconds</Link>
-          </section>
-        )}
-
         <section style={panel}>
           <h2 style={sectionTitle}>What it asks of you</h2>
           <p style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--muted)", margin: "0 0 4px" }}>ELIGIBILITY</p>
@@ -188,7 +177,7 @@ export default function OpportunityDetail() {
         </section>
 
         <p style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", marginBottom: 40 }}>
-          {detailed ? req.note : req.note} Always confirm details on the official site.
+          {req.note} Always confirm details on the official site.
         </p>
       </div>
     </main>

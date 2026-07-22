@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 
-// TODO: set this to the address where you want suggestions to land.
-const SUBMIT_EMAIL = "you@example.com";
+const SUBMIT_EMAIL = "kushangoel8@gmail.com";
 
 export default function SuggestPage() {
   const [f, setF] = useState({ title: "", org: "", url: "", region: "", deadline: "", why: "" });

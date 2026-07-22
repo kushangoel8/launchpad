@@ -1,8 +1,9 @@
 import "./globals.css";
 import Nav from "./components/Nav";
+import OnboardingGate from "./components/OnboardingGate";
 
 export const metadata = {
-  title: "Launchpad — opportunities for students who build",
+  title: "Launchpad - opportunities for students who build",
   description:
     "A living map of competitions, summer programs, olympiads, and fellowships for ambitious STEM students. Discover, filter, and never miss a deadline.",
 };
@@ -20,9 +21,10 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <Nav />
+        <OnboardingGate />
         {children}
         <footer className="site-foot">
-          <span>Launchpad — a starter set, kept honest. Always confirm deadlines on the official site.</span>
+          <span>Launchpad - a starter set, kept honest. Always confirm deadlines on the official site.</span>
         </footer>
       </body>
     </html>
