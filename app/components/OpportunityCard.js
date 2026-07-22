@@ -59,7 +59,7 @@ export default function OpportunityCard({ op, tracked, trackedInfo, onToggle, pr
 
       <div className="window-row" title={op.window}>{op.window}</div>
 
-      <DeadlineSignal deadline={op.deadline} approx={op.approx} />
+      <DeadlineSignal deadline={op.deadline} approx={op.approx} verifiedAt={op.verifiedAt} />
 
       {tracked && (
         <div className="status-row">
