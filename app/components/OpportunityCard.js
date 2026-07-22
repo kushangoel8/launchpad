@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import DeadlineSignal from "./DeadlineSignal";
 import { STATUSES, setStatus } from "../lib/store";
 
@@ -75,10 +76,12 @@ export default function OpportunityCard({ op, tracked, trackedInfo, onToggle, pr
       )}
 
       <footer className="card-foot">
-        <a className="official-link" href={op.url} target="_blank" rel="noopener noreferrer">
-          Official site
+        <Link className="official-link" href={`/opportunity/${op.id}`}>
+          How to apply
+        </Link>
+        <a className="confirm-note" href={op.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline" }}>
+          official site
         </a>
-        <span className="confirm-note">confirm deadline on official site</span>
       </footer>
     </article>
   );

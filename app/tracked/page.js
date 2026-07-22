@@ -1,17 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { opportunities } from "../lib/opportunities";
+import { indiaOpportunities } from "../lib/opportunities.india";
 import { useTracked, toggleTracked } from "../lib/store";
+import { getProfile } from "../lib/profile";
 import { urgencyRank, daysLeft } from "../components/DeadlineSignal";
 import OpportunityCard from "../components/OpportunityCard";
 
+const ALL = [...opportunities, ...indiaOpportunities];
+
 export default function Tracked() {
   const tracked = useTracked();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    setProfile(getProfile());
+  }, []);
 
   const items = useMemo(() => {
-    return opportunities
+    return ALL
       .filter((op) => tracked[op.id])
       .sort((a, b) => urgencyRank(a.deadline) - urgencyRank(b.deadline));
   }, [tracked]);
@@ -26,8 +35,8 @@ export default function Tracked() {
       <main className="page">
         <div className="empty tall">
           <h1 className="empty-title">Your launchpad is empty</h1>
-          <p>Track opportunities and they&apos;ll line up here — the closest deadline always on top.</p>
-          <Link href="/" className="empty-cta">Find opportunities →</Link>
+          <p>Track opportunities and they&apos;ll line up here &mdash; the closest deadline always on top.</p>
+          <Link href="/" className="empty-cta">Find opportunities</Link>
         </div>
       </main>
     );
@@ -39,9 +48,9 @@ export default function Tracked() {
         <p className="eyebrow">Your tracking board</p>
         <h1 className="hero-title small">
           {items.length} tracked
-          {closingSoon > 0 ? <span className="hero-accent"> · {closingSoon} closing within 3 weeks</span> : null}
+          {closingSoon > 0 ? <span className="hero-accent"> - {closingSoon} closing within 3 weeks</span> : null}
         </h1>
-        <p className="hero-sub">Sorted by what closes first. Move each one from Interested → Applying → Submitted as you go.</p>
+        <p className="hero-sub">Sorted by what closes first. Move each one from Interested to Applying to Submitted as you go.</p>
       </header>
 
       <section className="grid">
@@ -52,6 +61,7 @@ export default function Tracked() {
             tracked={true}
             trackedInfo={tracked[op.id]}
             onToggle={toggleTracked}
+            profile={profile}
           />
         ))}
       </section>
